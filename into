@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ "$1" = "" ]; then
+    echo "no platform"
+    exit 1
+fi
+
+image=`sudo docker images $1 | sed '1d;p'`
+if [ "${image}" = "" ]; then
+    sudo docker build -t $1:latest -f docker/Dockerfile.$1 ./
+fi
+
+sudo docker run -it --rm -v $(dirname $(pwd)):/source -v $(pwd)/package/$1:/package -v $(pwd)/prebuilt/$1/system:/system -v $(pwd)/prebuilt/$1/daily_build:/daily_build $1:latest /bin/bash

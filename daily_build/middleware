@@ -1,0 +1,13 @@
+#!/bin/sh
+
+DATE=$1
+PLATFORM=$2
+DAILY_BUILD=$3
+
+if [ `echo ${PLATFORM} | grep lib32 | wc -l` != 0 ]; then
+    type=32bit
+else
+    type=64bit
+fi
+
+curl ftp://10.58.65.3/sw_rls/cv1835/daily_build/cv183x_master/${DATE}/sdk_release/extra/${type}/mw.tar.gz | tar -xzC ${DAILY_BUILD}

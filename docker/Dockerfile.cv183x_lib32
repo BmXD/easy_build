@@ -1,0 +1,50 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    wget \
+    xz-utils \
+    make \
+    build-essential \
+    ca-certificates \
+    pkg-config \
+    bison \
+    flex \
+    python \
+    gettext \
+    git \
+    automake \
+    autopoint \
+    libtool \
+    libtool-bin \
+    libglib2.0-dev \
+    gtk-doc-tools \
+    lib32ncurses5 \
+    lib32tinfo5 \
+    libc6-i386
+
+RUN curl -fsL http://www.cmake.org/files/v3.12/cmake-3.12.4.tar.gz | tar -xz && \
+    cd cmake-3.12.4/ && \
+    ./configure && \
+    make && \
+    make install && cd .. && rm -r cmake-3.12.4
+
+RUN mkdir -p /toolchain/host-tools/gcc && \
+    curl ftp://10.34.33.5/prebuilt/toolchain/gcc-linaro-6.3.1-2017.05-i686_arm-linux-gnueabihf.tar.xz | tar -xvJC /toolchain/host-tools/gcc
+
+ENV PKG_CONFIG_PATH=/system/lib/pkgconfig
+ENV TOOLCHAIN="/toolchain/host-tools/gcc/gcc-linaro-6.3.1-2017.05-i686_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-"
+ENV CC="${TOOLCHAIN}gcc"
+ENV CXX="${TOOLCHAIN}g++"
+ENV STRIP="${TOOLCHAIN}strip"
+ENV AR="${TOOLCHAIN}ar"
+ENV RANLIB="${TOOLCHAIN}ranlib"
+ENV HOST="arm-linux-gnueabihf"
+ENV TARGET="arm-linux-gnueabihf"
+ENV SYSROOT="/toolchain/host-tools/gcc/gcc-linaro-6.3.1-2017.05-i686_arm-linux-gnueabihf/arm-linux-gnueabihf/libc"
+ENV CFLAGS="-I${SYSROOT}/usr/include -I/system/include"
+ENV CXXFLAGS="-I${SYSROOT}/usr/include -I/system/include"
+ENV LDFLAGS="-L${SYSROOT}/lib -L${SYSROOT}/usr/lib -L/system/lib"
+ENV PACKAGE_DIR="/package"
+ENV PACKAGE_TMP_DIR="${PACKAGE_DIR}/tmp"
+ENV PLATFORM=cv183x_lib32
